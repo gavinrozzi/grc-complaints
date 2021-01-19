@@ -1,0 +1,90 @@
+---
+title: "New Jersey GRC Complaint Tracker"
+output: 
+  flexdashboard::flex_dashboard:
+    source_code: "https://github.com/gavinrozzi/grc-complaints"
+    orientation: rows
+    vertical_layout: fill
+    social: [ "twitter", "facebook", "menu" ]
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(wordcloud2)
+
+# Read in scraped data from GRC website
+data <- read.csv('grc-complaints.csv')
+
+# Create summaries based upon complaint states and public entities for visualizations               
+state_summary <- data %>% group_by(Status) %>% tally() %>% arrange(desc(n))
+pb_summary <- data %>% group_by(PublicEntity) %>% tally() %>% arrange(desc(n))
+comp_summary <- data %>% group_by(Complainant) %>% tally() %>% arrange(desc(n))
+```
+
+Home
+===================================== 
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Total Complaints
+
+```{r}
+valueBox(nrow(data), icon = "fa-balance-scale")
+```
+
+-----------------------------------------------------------------------
+
+
+### Complainants
+
+```{r}
+valueBox(length(unique(data$Complainant)), icon = "fa-user")
+```
+
+
+-----------------------------------------------------------------------
+
+### Public entities with Complaints
+
+```{r}
+valueBox(length(unique(data$PublicEntity)), icon = "fa-file-alt")
+```
+
+-----------------------------------------------------------------------
+
+### Penalty Imposed
+
+```{r}
+penalty_count <- data %>% 
+  filter(Status == "Final Decision on Custodian Penalty") %>% 
+  count()
+
+valueBox(penalty_count, icon = "fa-gavel",color = ifelse(penalty_count < 5, "warning", "primary"))
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Agencies With The Most Complaints
+
+```{r}
+pb_summary_top10 <- pb_summary %>% top_n(10)
+fig <- plot_ly(x = ~reorder(pb_summary_top10$PublicEntity,pb_summary_top10$n), y = pb_summary_top10$n , type = 'bar')
+fig
+```
+
+### Top Complainants
+
+```{r}
+wordcloud2(data=comp_summary)
+```
+
+Public Authorities
+===================================== 
+
+Complainants
+===================================== 
+
