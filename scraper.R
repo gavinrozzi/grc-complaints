@@ -32,20 +32,8 @@ for (i in 1:nrow(complaints)) {
 
 # Manually fix problematic PDF urls
 complaints$PDF[11] <- paste0(baseurl,"Mann v. Borough of Woodcliff Lake, 2005-69 (FD).pdf")
-
 complaints$PDF[12] <- paste0(baseurl,"2005-125-FD.pdf")
 
-
-# Parse raw text from PDF if there is a PDF associated with a complaint
-for (i in 1:nrow(complaints)) {
-    complaints$text[i] = pdf_text(complaints$PDF[i])
-}
-
-
-# Extract data from text
-terms <- unlist(strsplit(complaints$text[2224], "\n"))
-terms[grep("Date of Request:", terms)]
-terms[grep("Date of Complaint:", terms)]
 
 # Write out the scraped data
 write.csv(complaints,'grc-complaints.csv',row.names = FALSE)
