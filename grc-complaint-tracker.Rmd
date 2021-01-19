@@ -15,9 +15,10 @@ library(plotly)
 library(wordcloud2)
 
 # Read in scraped data from GRC website
-data <- read.csv('grc-complaints.csv')
+data <- read.csv('grc-complaints.csv') %>% mutate(year = substr(CaseNumber,1,4))
 
-# Create summaries based upon complaint states and public entities for visualizations               
+# Create summaries based upon complaint states and public entities for visualizations       
+year_summary <- data %>% group_by(year) %>% tally() %>% arrange(year)
 state_summary <- data %>% group_by(Status) %>% tally() %>% arrange(desc(n))
 pb_summary <- data %>% group_by(PublicEntity) %>% tally() %>% arrange(desc(n))
 comp_summary <- data %>% group_by(Complainant) %>% tally() %>% arrange(desc(n))
@@ -76,15 +77,25 @@ fig <- plot_ly(x = ~reorder(pb_summary_top10$PublicEntity,pb_summary_top10$n), y
 fig
 ```
 
-### Top Complainants
+
+### Complaints By Year
 
 ```{r}
-wordcloud2(data=comp_summary)
+
+fig <- plot_ly(x = year_summary$year, y = year_summary$n , type = 'scatter', mode = 'lines+markers')
+fig
 ```
+
 
 Public Authorities
 ===================================== 
 
 Complainants
 ===================================== 
+
+### Top Complainants
+
+```{r}
+wordcloud2(data=comp_summary)
+```
 
