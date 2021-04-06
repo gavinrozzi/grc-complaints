@@ -4,11 +4,11 @@ on:
   push:
     branches: main
 
-name: Scrape Executive Orders
+name: Scrape NJ GRC Complaints
 
 jobs:
   render:
-    name: Scrape Executive Orders
+    name: Scrape NJ GRC Complaints
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
